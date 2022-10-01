@@ -16,7 +16,6 @@
 #define SHAREEMODEL_H
 
 #include <QObject>
-#include <QFlags>
 #include <QAbstractListModel>
 #include <QLoggingCategory>
 #include <QModelIndex>
