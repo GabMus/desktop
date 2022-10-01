@@ -168,7 +168,7 @@ private:
     AccessManagerFactory _accessManagerFactory;
 
     QSet<qlonglong> _callsAlreadyNotified;
-    QVector<QSharedPointer<QQuickWindow>> _dialogs;
+    QVector<QQuickWindow*> _dialogs;
 };
 
 } // namespace OCC
