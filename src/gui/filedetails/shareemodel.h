@@ -95,7 +95,7 @@ private slots:
 private:
     ShareePtr parseSharee(const QJsonObject &data) const;
 
-    QTimer _userStoppedTypingTimer;
+    QTimer _searchRateLimitingTimer;
 
     AccountState *_accountState;
     QString _searchString;
