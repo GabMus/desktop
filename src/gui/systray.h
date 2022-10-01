@@ -140,6 +140,8 @@ private slots:
     void slotPauseAllFolders();
 
 private:
+    // Argument allows user to specify a specific dialog to be raised
+    bool raiseFileDetailDialogs(const QString &localPath = {});
     void setPauseOnAllFoldersHelper(bool pause);
 
     static Systray *_instance;
@@ -168,7 +170,7 @@ private:
     AccessManagerFactory _accessManagerFactory;
 
     QSet<qlonglong> _callsAlreadyNotified;
-    QVector<QQuickWindow*> _dialogs;
+    QVector<QQuickWindow*> _fileDetailDialogs;
 };
 
 } // namespace OCC
