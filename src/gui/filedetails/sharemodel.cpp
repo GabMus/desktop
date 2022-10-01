@@ -889,6 +889,10 @@ QString ShareModel::localPath() const
 
 void ShareModel::setLocalPath(const QString &localPath)
 {
+    if (localPath == _localPath) {
+        return;
+    }
+
     _localPath = localPath;
     Q_EMIT localPathChanged();
     updateData();
@@ -901,6 +905,10 @@ AccountState *ShareModel::accountState() const
 
 void ShareModel::setAccountState(AccountState *accountState)
 {
+    if (accountState == _accountState) {
+        return;
+    }
+
     _accountState = accountState;
 
     // Change the server and account-related properties

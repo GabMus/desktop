@@ -83,11 +83,15 @@ QVariant ShareeModel::data(const QModelIndex &index, const int role) const
 
 AccountState *ShareeModel::accountState() const
 {
-    return _accountState.data();
+    return _accountState;
 }
 
 void ShareeModel::setAccountState(AccountState *accountState)
 {
+    if (accountState == _accountState) {
+        return;
+    }
+
     _accountState = accountState;
     Q_EMIT accountStateChanged();
 }
@@ -99,6 +103,10 @@ bool ShareeModel::shareItemIsFolder() const
 
 void ShareeModel::setShareItemIsFolder(const bool shareItemIsFolder)
 {
+    if (shareItemIsFolder == _shareItemIsFolder) {
+        return;
+    }
+
     _shareItemIsFolder = shareItemIsFolder;
     Q_EMIT shareItemIsFolderChanged();
 }
@@ -110,6 +118,10 @@ QString ShareeModel::searchString() const
 
 void ShareeModel::setSearchString(const QString &searchString)
 {
+    if (searchString == _searchString) {
+        return;
+    }
+
     _searchString = searchString;
     Q_EMIT searchStringChanged();
 
@@ -128,6 +140,10 @@ ShareeModel::LookupMode ShareeModel::lookupMode() const
 
 void ShareeModel::setLookupMode(const ShareeModel::LookupMode lookupMode)
 {
+    if (lookupMode == _lookupMode) {
+        return;
+    }
+
     _lookupMode = lookupMode;
     Q_EMIT lookupModeChanged();
 }
