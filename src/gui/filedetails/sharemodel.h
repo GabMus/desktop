@@ -123,33 +123,22 @@ public slots:
     void createNewLinkShare() const;
     void createNewLinkShareWithPassword(const QString &password) const;
     void createNewUserGroupShare(const ShareePtr &sharee);
-    void createNewUserGroupShareFromQml(const QVariant &sharee);
     void createNewUserGroupShareWithPassword(const ShareePtr &sharee, const QString &password) const;
-    void createNewUserGroupShareWithPasswordFromQml(const QVariant &sharee, const QString &password) const;
 
     void deleteShare(const SharePtr &share) const;
-    void deleteShareFromQml(const QVariant &share) const;
 
     void toggleShareAllowEditing(const SharePtr &share, const bool enable) const;
-    void toggleShareAllowEditingFromQml(const QVariant &share, const bool enable) const;
     void toggleShareAllowResharing(const SharePtr &share, const bool enable) const;
-    void toggleShareAllowResharingFromQml(const QVariant &share, const bool enable) const;
     void toggleSharePasswordProtect(const SharePtr &share, const bool enable);
-    void toggleSharePasswordProtectFromQml(const QVariant &share, const bool enable);
     void toggleShareExpirationDate(const SharePtr &share, const bool enable) const;
-    void toggleShareExpirationDateFromQml(const QVariant &share, const bool enable) const;
     void toggleShareNoteToRecipient(const SharePtr &share, const bool enable) const;
-    void toggleShareNoteToRecipientFromQml(const QVariant &share, const bool enable) const;
 
     void setLinkShareLabel(const QSharedPointer<LinkShare> &linkShare, const QString &label) const;
-    void setLinkShareLabelFromQml(const QVariant &linkShare, const QString &label) const;
     void setShareExpireDate(const SharePtr &share, const qint64 milliseconds) const;
     // Needed as ints in QML are 32 bits so we need to use a QVariant
     void setShareExpireDateFromQml(const QVariant &share, const QVariant milliseconds) const;
     void setSharePassword(const SharePtr &share, const QString &password);
-    void setSharePasswordFromQml(const QVariant &share, const QString &password);
     void setShareNote(const SharePtr &share, const QString &note) const;
-    void setShareNoteFromQml(const QVariant &share, const QString &note) const;
 
 private slots:
     void resetData();

@@ -631,12 +631,6 @@ void ShareModel::toggleShareAllowEditing(const SharePtr &share, const bool enabl
     share->setPermissions(permissions);
 }
 
-void ShareModel::toggleShareAllowEditingFromQml(const QVariant &share, const bool enable) const
-{
-    const auto ptr = share.value<SharePtr>();
-    toggleShareAllowEditing(ptr, enable);
-}
-
 void ShareModel::toggleShareAllowResharing(const SharePtr &share, const bool enable) const
 {
     if (share.isNull()) {
@@ -647,12 +641,6 @@ void ShareModel::toggleShareAllowResharing(const SharePtr &share, const bool ena
     enable ? permissions |= SharePermissionShare : permissions &= ~SharePermissionShare;
 
     share->setPermissions(permissions);
-}
-
-void ShareModel::toggleShareAllowResharingFromQml(const QVariant &share, const bool enable) const
-{
-    const auto ptr = share.value<SharePtr>();
-    toggleShareAllowResharing(ptr, enable);
 }
 
 void ShareModel::toggleSharePasswordProtect(const SharePtr &share, const bool enable)
@@ -671,12 +659,6 @@ void ShareModel::toggleSharePasswordProtect(const SharePtr &share, const bool en
     share->setPassword(randomPassword);
 }
 
-void ShareModel::toggleSharePasswordProtectFromQml(const QVariant &share, const bool enable)
-{
-    const auto ptr = share.value<SharePtr>();
-    toggleSharePasswordProtect(ptr, enable);
-}
-
 void ShareModel::toggleShareExpirationDate(const SharePtr &share, const bool enable) const
 {
     if (share.isNull()) {
@@ -690,12 +672,6 @@ void ShareModel::toggleShareExpirationDate(const SharePtr &share, const bool ena
     } else if (const auto userGroupShare = share.objectCast<UserGroupShare>()) {
         userGroupShare->setExpireDate(expireDate);
     }
-}
-
-void ShareModel::toggleShareExpirationDateFromQml(const QVariant &share, const bool enable) const
-{
-    const auto ptr = share.value<SharePtr>();
-    toggleShareExpirationDate(ptr, enable);
 }
 
 void ShareModel::toggleShareNoteToRecipient(const SharePtr &share, const bool enable) const
@@ -712,12 +688,6 @@ void ShareModel::toggleShareNoteToRecipient(const SharePtr &share, const bool en
     }
 }
 
-void ShareModel::toggleShareNoteToRecipientFromQml(const QVariant &share, const bool enable) const
-{
-    const auto ptr = share.value<SharePtr>();
-    toggleShareNoteToRecipient(ptr, enable);
-}
-
 void ShareModel::setLinkShareLabel(const QSharedPointer<LinkShare> &linkShare, const QString &label) const
 {
     if (linkShare.isNull()) {
@@ -725,13 +695,6 @@ void ShareModel::setLinkShareLabel(const QSharedPointer<LinkShare> &linkShare, c
     }
 
     linkShare->setLabel(label);
-}
-
-void ShareModel::setLinkShareLabelFromQml(const QVariant &linkShare, const QString &label) const
-{
-    // All of our internal share pointers are SharePtr, so cast to LinkShare for this method
-    const auto ptr = linkShare.value<SharePtr>().objectCast<LinkShare>();
-    setLinkShareLabel(ptr, label);
 }
 
 void ShareModel::setShareExpireDate(const SharePtr &share, const qint64 milliseconds) const
@@ -766,12 +729,6 @@ void ShareModel::setSharePassword(const SharePtr &share, const QString &password
     share->setPassword(password);
 }
 
-void ShareModel::setSharePasswordFromQml(const QVariant &share, const QString &password)
-{
-    const auto ptr = share.value<SharePtr>();
-    setSharePassword(ptr, password);
-}
-
 void ShareModel::setShareNote(const SharePtr &share, const QString &note) const
 {
     if (share.isNull()) {
@@ -783,12 +740,6 @@ void ShareModel::setShareNote(const SharePtr &share, const QString &note) const
     } else if (const auto userGroupShare = share.objectCast<UserGroupShare>()) {
         userGroupShare->setNote(note);
     }
-}
-
-void ShareModel::setShareNoteFromQml(const QVariant &share, const QString &note) const
-{
-    const auto ptr = share.value<SharePtr>();
-    setShareNote(ptr, note);
 }
 
 // ------------------- Share creation and deletion slots ------------------- //
@@ -847,17 +798,6 @@ void ShareModel::createNewUserGroupShareWithPassword(const ShareePtr &sharee, co
                           password);
 }
 
-void ShareModel::createNewUserGroupShareFromQml(const QVariant &sharee)
-{
-    const auto ptr = sharee.value<ShareePtr>();
-    createNewUserGroupShare(ptr);
-}
-
-void ShareModel::createNewUserGroupShareWithPasswordFromQml(const QVariant &sharee, const QString &password) const
-{
-    const auto ptr = sharee.value<ShareePtr>();
-    createNewUserGroupShareWithPassword(ptr, password);
-}
 
 void ShareModel::deleteShare(const SharePtr &share) const
 {
@@ -866,12 +806,6 @@ void ShareModel::deleteShare(const SharePtr &share) const
     }
 
     share->deleteShare();
-}
-
-void ShareModel::deleteShareFromQml(const QVariant &share) const
-{
-    const auto ptr = share.value<SharePtr>();
-    deleteShare(ptr);
 }
 
 // --------------------------- QPROPERTY methods --------------------------- //

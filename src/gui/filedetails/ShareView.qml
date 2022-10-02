@@ -108,7 +108,7 @@ ColumnLayout {
 
         onAccepted: {
             if(sharee) {
-                root.shareModel.createNewUserGroupShareWithPasswordFromQml(sharee, dialogPasswordField.text);
+                root.shareModel.createNewUserGroupShareWithPassword(sharee, dialogPasswordField.text);
                 sharee = undefined;
             } else {
                 root.shareModel.createNewLinkShareWithPassword(dialogPasswordField.text);
@@ -160,7 +160,7 @@ ColumnLayout {
 
         onShareeSelected: {
             root.waitingForSharesToChange = true;
-            root.shareModel.createNewUserGroupShareFromQml(sharee)
+            root.shareModel.createNewUserGroupShare(sharee)
         }
     }
 
@@ -224,19 +224,19 @@ ColumnLayout {
                     }
                     onDeleteShare: {
                         root.waitingForSharesToChange = true;
-                        shareModel.deleteShareFromQml(model.share);
+                        shareModel.deleteShare(model.share);
                     }
 
-                    onToggleAllowEditing: shareModel.toggleShareAllowEditingFromQml(model.share, enable)
-                    onToggleAllowResharing: shareModel.toggleShareAllowResharingFromQml(model.share, enable)
-                    onTogglePasswordProtect: shareModel.toggleSharePasswordProtectFromQml(model.share, enable)
-                    onToggleExpirationDate: shareModel.toggleShareExpirationDateFromQml(model.share, enable)
-                    onToggleNoteToRecipient: shareModel.toggleShareNoteToRecipientFromQml(model.share, enable)
+                    onToggleAllowEditing: shareModel.toggleShareAllowEditing(model.share, enable)
+                    onToggleAllowResharing: shareModel.toggleShareAllowResharing(model.share, enable)
+                    onTogglePasswordProtect: shareModel.toggleSharePasswordProtect(model.share, enable)
+                    onToggleExpirationDate: shareModel.toggleShareExpirationDate(model.share, enable)
+                    onToggleNoteToRecipient: shareModel.toggleShareNoteToRecipient(model.share, enable)
 
-                    onSetLinkShareLabel: shareModel.setLinkShareLabelFromQml(model.share, label)
+                    onSetLinkShareLabel: shareModel.setLinkShareLabel(model.share, label)
                     onSetExpireDate: shareModel.setShareExpireDateFromQml(model.share, milliseconds)
-                    onSetPassword: shareModel.setSharePasswordFromQml(model.share, password)
-                    onSetNote: shareModel.setShareNoteFromQml(model.share, note)
+                    onSetPassword: shareModel.setSharePassword(model.share, password)
+                    onSetNote: shareModel.setShareNote(model.share, note)
                 }
 
                 Loader {
