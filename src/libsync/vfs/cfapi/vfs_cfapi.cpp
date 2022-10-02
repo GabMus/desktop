@@ -358,8 +358,8 @@ void VfsCfApi::requestHydration(const QString &requestId, const QString &path)
 
     // Set in the database that we should download the file
     SyncJournalFileRecord record;
-    journal->getFileRecord(relativePath, &record);
-    if (!record.isValid()) {
+    const auto result = journal->getFileRecord(relativePath, &record);
+    if (!result || !record.isValid()) {
         qCInfo(lcCfApi) << "Couldn't hydrate, did not find file in db";
         emit hydrationRequestFailed(requestId);
         return;
