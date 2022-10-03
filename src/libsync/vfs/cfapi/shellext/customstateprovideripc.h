@@ -16,7 +16,6 @@
 
 class QLocalSocket;
 
-#include <QScopedPointer>
 #include <QString>
 #include <QVariant>
 
@@ -40,6 +39,6 @@ public:
     static QString overrideServerName;
 
 private:
-    QScopedPointer<QLocalSocket> _localSocket;
+    QLocalSocket *_localSocket;
 };
 }

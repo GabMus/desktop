@@ -26,11 +26,12 @@ namespace VfsShellExtensions {
 
 CustomStateProviderIpc::CustomStateProviderIpc()
 {
-    _localSocket.reset(new QLocalSocket());
+    _localSocket = new QLocalSocket;
 }
 CustomStateProviderIpc::~CustomStateProviderIpc()
 {
     disconnectSocketFromServer();
+    _localSocket->deleteLater();
 }
 
 QVariantList CustomStateProviderIpc::fetchCustomStatesForFile(const QString &filePath)

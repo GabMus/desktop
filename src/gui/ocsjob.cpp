@@ -40,7 +40,7 @@ void OcsJob::setVerb(const QByteArray &verb)
 
 void OcsJob::addParam(const QString &name, const QString &value)
 {
-    _params.append(qMakePair(name, value));
+    _params.insert(name, value);
 }
 
 void OcsJob::addPassStatusCode(int code)
@@ -60,27 +60,19 @@ void OcsJob::addRawHeader(const QByteArray &headerName, const QByteArray &value)
 
 QString OcsJob::getParamValue(const QString &key) const
 {
-    const auto foundParam = std::find_if(std::cbegin(_params), std::cend(_params), [&key](const auto &currentParam) {
-        return currentParam.first == key;
-    });
-
-    if (foundParam != std::cend(_params)) {
-        return foundParam->second;
-    }
-
-    return {};
+    return _params.value(key);
 }
 
 static QUrlQuery percentEncodeQueryItems(
-    const QList<QPair<QString, QString>> &items)
+    const QHash<QString, QString> &items)
 {
     QUrlQuery result;
     // Note: QUrlQuery::setQueryItems() does not fully percent encode
     // the query items, see #5042
-    foreach (const auto &item, items) {
+    for (auto it = std::cbegin(items); it != std::cend(items); ++it) {
         result.addQueryItem(
-            QUrl::toPercentEncoding(item.first),
-            QUrl::toPercentEncoding(item.second));
+            QUrl::toPercentEncoding(it.key()),
+            QUrl::toPercentEncoding(it.value()));
     }
     return result;
 }
@@ -98,13 +90,13 @@ void OcsJob::start()
     } else if (_verb == "POST" || _verb == "PUT") {
         // Url encode the _postParams and put them in a buffer.
         QByteArray postData;
-        Q_FOREACH (auto tmp, _params) {
+        for (auto it = std::cbegin(_params); it != std::cend(_params); ++it) {
             if (!postData.isEmpty()) {
                 postData.append("&");
             }
-            postData.append(QUrl::toPercentEncoding(tmp.first));
+            postData.append(QUrl::toPercentEncoding(it.key()));
             postData.append("=");
-            postData.append(QUrl::toPercentEncoding(tmp.second));
+            postData.append(QUrl::toPercentEncoding(it.value()));
         }
         buffer->setData(postData);
     }

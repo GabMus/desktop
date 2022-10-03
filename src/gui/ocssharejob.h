@@ -131,7 +131,7 @@ public:
      */
     void getSharedWithMe();
 
-    static QString pathForGetSharesRequest();
+    static const QString _pathForSharesRequest;
 
 signals:
     /**

@@ -19,8 +19,7 @@
 #include "abstractnetworkjob.h"
 
 #include <QVector>
-#include <QList>
-#include <QPair>
+#include <QHash>
 #include <QUrl>
 
 #define OCS_SUCCESS_STATUS_CODE 100
@@ -151,7 +150,7 @@ private slots:
 
 private:
     QByteArray _verb;
-    QList<QPair<QString, QString>> _params;
+    QHash<QString, QString> _params;
     QVector<int> _passStatusCodes;
     QNetworkRequest _request;
 };

@@ -215,7 +215,7 @@ private slots:
 
                 const auto path = req.url().path();
 
-                if (path.endsWith(OCC::OcsShareJob::pathForGetSharesRequest())) {
+                if (path.endsWith(OCC::OcsShareJob::_pathForSharesRequest)) {
                     const auto jsonReply = TestCfApiShellExtensionsIPC::replyWithNoShares ? fakeNoSharesResponse : fakeSharedFilesResponse;
                     TestCfApiShellExtensionsIPC::replyWithNoShares = false;
                     auto fakePayloadReply = new FakePayloadReply(op, req, jsonReply, nullptr);
@@ -366,8 +366,8 @@ private slots:
                     record._lockstate._lockTime = QDateTime::currentMSecsSinceEpoch();
                     record._lockstate._lockTimeout = 1000 * 60 * 60;
                 }
-                fakeFolder.syncJournal().setFileRecord(record);
-                realFolder->journalDb()->setFileRecord(record);
+                QVERIFY(fakeFolder.syncJournal().setFileRecord(record));
+                QVERIFY(realFolder->journalDb()->setFileRecord(record));
             }
         }
 
@@ -413,8 +413,8 @@ private slots:
             if (fakeFolder.syncJournal().getFileRecord(it.key(), &record)) {
                 record._remotePerm.unsetPermission(OCC::RemotePermissions::Permissions::IsShared);
                 record._isShared = false;
-                fakeFolder.syncJournal().setFileRecord(record);
-                realFolder->journalDb()->setFileRecord(record);
+                QVERIFY(fakeFolder.syncJournal().setFileRecord(record));
+                QVERIFY(realFolder->journalDb()->setFileRecord(record));
             }
         }
         QVERIFY(fakeFolder.syncOnce());

@@ -22,6 +22,7 @@
 #include "ocssharejob.h"
 #include <QDir>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QLocalSocket>
 
@@ -31,6 +32,8 @@ constexpr auto folderAliasPropertyKey = "folderAlias";
 }
 
 namespace OCC {
+
+Q_LOGGING_CATEGORY(lcShellExtServer, "nextcloud.gui.shellextensions.server", QtInfoMsg)
 
 ShellExtensionsServer::ShellExtensionsServer(QObject *parent)
     : QObject(parent)
@@ -106,7 +109,7 @@ void ShellExtensionsServer::processCustomStateRequest(QLocalSocket *socket, cons
 
     SyncJournalFileRecord record;
     if (!folder->journalDb()->getFileRecord(filePathRelative, &record) || !record.isValid() || record.path().isEmpty()) {
-        qWarning() << "Record not found in SyncJournal for: " << filePathRelative;
+        qCWarning(lcShellExtServer) << "Record not found in SyncJournal for: " << filePathRelative;
         sendEmptyDataAndCloseSession(socket);
         return;
     }
@@ -124,7 +127,7 @@ void ShellExtensionsServer::processCustomStateRequest(QLocalSocket *socket, cons
     };
 
     if (QDateTime::currentMSecsSinceEpoch() - record._lastShareStateFetchedTimestmap < _isSharedInvalidationInterval) {
-        qInfo() << record.path() << " record._lastShareStateFetchedTimestmap has less than " << _isSharedInvalidationInterval << " ms difference with QDateTime::currentMSecsSinceEpoch(). Returning data from SyncJournal.";
+        qCInfo(lcShellExtServer) << record.path() << " record._lastShareStateFetchedTimestmap has less than " << _isSharedInvalidationInterval << " ms difference with QDateTime::currentMSecsSinceEpoch(). Returning data from SyncJournal.";
         sendJsonMessageWithVersion(socket, composeMessageReplyFromRecord(record));
         closeSession(socket);
         return;
@@ -150,12 +153,12 @@ void ShellExtensionsServer::processCustomStateRequest(QLocalSocket *socket, cons
             const auto folder = FolderMan::instance()->folder(folderAlias);
             SyncJournalFileRecord record;
             if (!folder || !folder->journalDb()->getFileRecord(filePathRelative, &record) || !record.isValid()) {
-                qWarning() << "Record not found in SyncJournal for: " << filePathRelative;
+                qCWarning(lcShellExtServer) << "Record not found in SyncJournal for: " << filePathRelative;
                 sendEmptyDataAndCloseSession(socket);
                 return;
             }
             
-            qInfo() << "Sending reply from OcsShareJob for socket: " << socket->socketDescriptor() << " and record: " << record.path();
+            qCInfo(lcShellExtServer) << "Sending reply from OcsShareJob for socket: " << socket->socketDescriptor() << " and record: " << record.path();
             sendJsonMessageWithVersion(socket, composeMessageReplyFromRecord(record));
             closeSession(socket);
         }));
@@ -175,10 +178,10 @@ void ShellExtensionsServer::processCustomStateRequest(QLocalSocket *socket, cons
     QMutexLocker locker(&_runningFetchShareJobsMutex);
     if (!_runningFetchShareJobsForPaths.contains(sharesPath)) {
         _runningFetchShareJobsForPaths.push_back(sharesPath);
-        qInfo() << "Started OcsShareJob for path: " << sharesPath;
+        qCInfo(lcShellExtServer) << "Started OcsShareJob for path: " << sharesPath;
         job->getShares(sharesPath, {{QStringLiteral("subfiles"), QStringLiteral("true")}});
     } else {
-        qInfo() << "OcsShareJob is already running for path: " << sharesPath;
+        qCInfo(lcShellExtServer) << "OcsShareJob is already running for path: " << sharesPath;
     }
 }
 
@@ -250,7 +253,7 @@ void ShellExtensionsServer::slotNewConnection()
         parseCustomStateRequest(socket, message);
         return;
     }
-    qWarning() << "Invalid message received from shell extension: " << message;
+    qCWarning(lcShellExtServer) << "Invalid message received from shell extension: " << message;
     sendEmptyDataAndCloseSession(socket);
     return;
 }
@@ -261,7 +264,7 @@ void ShellExtensionsServer::slotSharesFetched(const QJsonDocument &reply)
 
     Q_ASSERT(job);
     if (!job) {
-        qWarning() << "ShellExtensionsServer::slotSharesFetched is not called by OcsShareJob's signal!";
+        qCWarning(lcShellExtServer) << "ShellExtensionsServer::slotSharesFetched is not called by OcsShareJob's signal!";
         return;
     }
 
@@ -274,7 +277,7 @@ void ShellExtensionsServer::slotSharesFetched(const QJsonDocument &reply)
 
     Q_ASSERT(!folderAlias.isEmpty());
     if (folderAlias.isEmpty()) {
-        qWarning() << "No 'folderAlias' set for OcsShareJob's instance!";
+        qCWarning(lcShellExtServer) << "No 'folderAlias' set for OcsShareJob's instance!";
         return;
     }
 
@@ -282,7 +285,7 @@ void ShellExtensionsServer::slotSharesFetched(const QJsonDocument &reply)
 
     Q_ASSERT(folder);
     if (!folder) {
-        qWarning() << "folder not found for folderAlias: " << folderAlias;
+        qCWarning(lcShellExtServer) << "folder not found for folderAlias: " << folderAlias;
         return;
     }
 
@@ -299,7 +302,9 @@ void ShellExtensionsServer::slotSharesFetched(const QJsonDocument &reply)
             }
             record._isShared = false;
             record._lastShareStateFetchedTimestmap = timeStamp;
-            folder->journalDb()->setFileRecord(record);
+            if (!folder->journalDb()->setFileRecord(record)) {
+                qCWarning(lcShellExtServer) << "Could not set file record for path: " << record._path;
+            }
         }
     }
 
@@ -328,10 +333,13 @@ void ShellExtensionsServer::slotSharesFetched(const QJsonDocument &reply)
         }
         record._isShared = true;
         record._lastShareStateFetchedTimestmap = timeStamp;
-        folder->journalDb()->setFileRecord(record);
+
+        if (!folder->journalDb()->setFileRecord(record)) {
+            qCWarning(lcShellExtServer) << "Could not set file record for path: " << record._path;
+        }
     }
 
-    qInfo() << "Succeeded OcsShareJob for path: " << sharesPath;
+    qCInfo(lcShellExtServer) << "Succeeded OcsShareJob for path: " << sharesPath;
     emit fetchSharesJobFinished(folderAlias);
 }
 
@@ -341,7 +349,7 @@ void ShellExtensionsServer::slotSharesFetchError(int statusCode, const QString &
 
     Q_ASSERT(job);
     if (!job) {
-        qWarning() << "ShellExtensionsServer::slotSharesFetched is not called by OcsShareJob's signal!";
+        qCWarning(lcShellExtServer) << "ShellExtensionsServer::slotSharesFetched is not called by OcsShareJob's signal!";
         return;
     }
 
@@ -351,7 +359,7 @@ void ShellExtensionsServer::slotSharesFetchError(int statusCode, const QString &
     _runningFetchShareJobsForPaths.removeAll(sharesPath);
 
     emit fetchSharesJobFinished(sharesPath);
-    qWarning() << "Failed OcsShareJob for path: " << sharesPath;
+    qCWarning(lcShellExtServer) << "Failed OcsShareJob for path: " << sharesPath;
 }
 
 void ShellExtensionsServer::parseCustomStateRequest(QLocalSocket *socket, const QVariantMap &message)

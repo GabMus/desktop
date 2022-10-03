@@ -15,12 +15,12 @@
 #pragma once
 
 #include <QObject>
-#include <QJsonDocument>
 #include <QLocalServer>
 #include <QMutex>
 #include <QSize>
 #include <QVariant>
 
+class QJsonDocument;
 class QLocalSocket;
 
 namespace OCC {
